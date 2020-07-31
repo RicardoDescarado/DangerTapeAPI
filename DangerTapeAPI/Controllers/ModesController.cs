@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DangerTapeAPI.Mediators.Queries;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,21 +13,18 @@ namespace DangerTapeAPI.Controllers
     [ApiController]
     public class ModesController : ControllerBase
     {
-        public ModesController()
+        private readonly IMediator _mediator;
+        public ModesController(IMediator mediator)
         {
-
+            _mediator = mediator;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<string>>> GetAllModes()
         {
-            var output = new List<string>
-            {
-                "Ionian",
-                "Dorian"
-            };
+            var result = await _mediator.Send(new GetAllModesRequest());
 
-            return await Task.FromResult(output);
+            return Ok(result);
         }
     }
 }
