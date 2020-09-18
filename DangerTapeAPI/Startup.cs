@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using DangerTapeAPI.Configuration;
+using DangerTapeAPI.Database.Entities;
+using DangerTapeAPI.Database.Repository;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.Swagger;
 
 namespace DangerTapeAPI
@@ -27,6 +32,16 @@ namespace DangerTapeAPI
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			var config = new DangerTapeAPIConfiguration
+			{
+				DangerTapeDBConnectionString =
+					Configuration.GetValue<string>("DangerTapeApiConfiguration:DangerTapeDBConnectionString")
+			};
+
+			services.AddSingleton<IDangerTapeAPIConfiguration>(config);
+			services.AddDangerTapeDBContext(config);
+			services.AddEfRepositories();
+
 			services.AddControllers();
 			services.AddMediatR(typeof(Startup).Assembly);
 			services.AddApiVersioning();
